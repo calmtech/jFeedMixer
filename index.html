@@ -2,22 +2,27 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>JFeedMixer Sample</title>
+<title>jFeedMixer Sample</title>
 <script src="http://www.google.com/jsapi?key=ABQIAAAA8i9-279pUt8yK02-ZkXRmxTtjp0KFkKu_BG_YUaO2pC4uS5aFxTY0WL2cic_XVW41GmDV5F8Zz5Smg"></script>
 <script>
   google.load("feeds", "1");
   google.load("jquery", "1.4.2");
 </script>
-<script src="js/jsfeeder.js">
-	$(function() {
-		jQuery.jfeedmixer({
-			feeds: [
-			        "http://www.yasuhisa.com/could/feed/",
-			        "http://neta.ywcafe.net/atom.xml"
-			],
-			count: 10
-		});
+<script src="js/jquery.jfeedmixer.js"></script>
+<script type="text/javascript">
+$(function() {
+	$('#feeds').jFeedMixer({
+		feeds: [
+		        "http://www.yasuhisa.com/could/feed/",
+		        "http://neta.ywcafe.net/atom.xml"
+		],
+		count: 10
 	});
+});
 </script>
 </head>
+<body>
+	<h1>jFeedMixer</h1>
+	<div id="feeds"></div>
+</body>
 </html>
