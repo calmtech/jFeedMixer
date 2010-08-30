@@ -1,0 +1,80 @@
+jFeedMixer 利用ガイド
+
+jFeedMixerは複数のRSSフィードを統合し、時系列に並べ替えたものを
+ウェブサイト上に埋め込んで表示することができる、jQueryプラグインです。
+
+[動作環境]
+jQuery 1.4.2 で動作確認を行っています。
+Google AJAX Feed API を利用するので、AJAX APIキーの
+取得が前提となります。
+対応するフィード形式はGoogle AJAX Feed API に準拠します。
+
+[導入方法]
+任意のHTMLファイルに以下の記述を追加してください。
+
+<html>
+<head>
+...
+<script type="text/javascript" src="http://www.google.com/jsapi?key=your_api_key"></script>
+<script type="text/javascript">
+  google.load("feeds", "1");
+  google.load("jquery", "1.4.2");
+</script>
+<script src="path/to/jquery.jfeedmixer.js"></script>
+<script type="text/javascript">
+$(function() {
+	$('#feeds').jFeedMixer({
+		feeds: [
+		        "http://www.foo.com/feed/",
+		        "http://bar.net/atom.xml"
+		],
+		countPerFeed: 5
+	});
+});
+</script>
+</head>
+<body>
+<div id="feeds">
+</div>
+</body>
+</html>
+[表示結果]
+jFeexMixerによる表示結果は、上記サンプルの場合、以下のようになります。
+<div id="feeds">
+<ul>
+<li><a href="http://link.to.feed">ここにタイトルが表示されます(2010.08.30)[ブログ名]</a></li>
+...
+</ul>
+</div>
+
+[表示オプション]
+オプションで以下を指定できます。
+
+feeds: ["feed URL", "..."]
+複数のフィードURLを指定できます。RSS、Atomなどが表示されるURLを指定してください。
+
+countPerFeed: 数値
+1フィードURLあたり取得するフィード数です。例えば、「5」と指定して、feedsに2つのURLを
+指定した場合は10件のフィードが表示されることになります。
+
+feedFormat: '<a href="%link">%title(%date)[%blogTitle]</a>'
+フィード表示のフォーマットを指定できます。各パラメータは以下のとおりです。
+%link: フィードへのリンク(URL)
+%title: フィードのタイトル
+%date: フィードの投稿日
+%blogTitle: フィードを管理するブログのタイトル
+%blogURL: フィードを管理するブログのURL
+
+dateFormat: 'yyyy.mm.dd'
+フィードの投稿日を表示する際のフォーマットを指定できます
+yyyy: 西暦
+mm: 月(1桁の場合はゼロパディング)
+dd: 日(1桁の場合はゼロパディング)
+H: 時
+i: 分
+s: 秒
+
+--
+jFeedMixerはGPL、MITライセンスのもと作成されています。
+http://www.calmtech.net
+info@calmtech.net
