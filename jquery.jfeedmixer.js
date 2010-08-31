@@ -19,7 +19,7 @@
 				feeds: new Array(),
 				countPerFeed: 5,
 				countLimit: 10,
-				feedFormat: '<a href="%link">%title(%date)[%blogTitle][%category]</a>',
+				feedFormat: '<a href="%link">%title<br />【%blogTitle】(%date)[%category]</a>',
 				dateFormat: 'yyyy.mm.dd',
 				categorySeparator: ', '
 			};

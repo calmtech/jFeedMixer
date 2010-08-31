@@ -20,13 +20,13 @@ Google AJAX Feed API を利用するので、AJAX APIキーの
   google.load("feeds", "1");
   google.load("jquery", "1.4.2");
 </script>
-<script src="path/to/jquery.jfeedmixer.js"></script>
+<script type="text/javascript" src="path/to/jquery.jfeedmixer.js"></script>
 <script type="text/javascript">
 $(function() {
 	$('#feeds').jFeedMixer({
 		feeds: [
-		        "http://www.foo.com/feed/",
-		        "http://bar.net/atom.xml"
+		        'http://www.foo.com/feed/',
+		        'http://bar.net/atom.xml'
 		],
 		countPerFeed: 5
 	});
@@ -42,7 +42,7 @@ $(function() {
 jFeexMixerによる表示結果は、上記サンプルの場合、以下のようになります。
 <div id="feeds">
 <ul>
-<li><a href="http://link.to.feed">ここにタイトルが表示されます(2010.08.30)[ブログ名]</a></li>
+<li><a href="http://link.to.feed">ここにタイトルが表示されます【ブログ名】(2010.08.30)[カテゴリ1, カテゴリ2]</a></li>
 ...
 </ul>
 </div>
@@ -50,23 +50,26 @@ jFeexMixerによる表示結果は、上記サンプルの場合、以下のよ�
 [表示オプション]
 オプションで以下を指定できます。
 
-feeds: ["feed URL", "..."]
+feeds: ['feed URL', '...'] 必須
 複数のフィードURLを指定できます。RSS、Atomなどが表示されるURLを指定してください。
 
-countPerFeed: 数値
+countPerFeed: 数値 オプション
 1フィードURLあたり取得するフィード数です。例えば、「5」と指定して、feedsに2つのURLを
 指定した場合は10件のフィードが表示されることになります。
 
-feedFormat: '<a href="%link">%title(%date)[%blogTitle]</a>'
+countLimit: 数値 オプション
+
+feedFormat: '<a href="%link">%title【%blogTitle】(%date)[%category]</a>'
 フィード表示のフォーマットを指定できます。各パラメータは以下のとおりです。
 %link: フィードへのリンク(URL)
 %title: フィードのタイトル
 %date: フィードの投稿日
 %blogTitle: フィードを管理するブログのタイトル
 %blogURL: フィードを管理するブログのURL
+%category: フィードのカテゴリ
 
-dateFormat: 'yyyy.mm.dd'
-フィードの投稿日を表示する際のフォーマットを指定できます
+dateFormat: 'yyyy.mm.dd' オプション
+フィードの投稿日を表示する際のフォーマットを指定できます。
 yyyy: 西暦
 mm: 月(1桁の場合はゼロパディング)
 dd: 日(1桁の場合はゼロパディング)
@@ -78,3 +81,7 @@ s: 秒
 jFeedMixerはGPL、MITライセンスのもと作成されています。
 http://www.calmtech.net
 info@calmtech.net
+
+[リリースノート]
+2010.08.30 jFeedMixer 0.1.0 を公開
+2010.08.31 カテゴリ表示、表示の最大件数オプションを追加
