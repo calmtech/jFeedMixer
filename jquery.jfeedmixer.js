@@ -18,8 +18,10 @@
 			this.defaults = {
 				feeds: new Array(),
 				countPerFeed: 5,
-				feedFormat: '<a href="%link">%title(%date)[%blogTitle]</a>',
+				countLimit: 10,
+				feedFormat: '<a href="%link">%title(%date)[%blogTitle][%category]</a>',
 				dateFormat: 'yyyy.mm.dd',
+				categorySeparator: ', '
 			};
 		}
 	});
@@ -33,14 +35,17 @@
 		function feedFormat(format, entry) {
 			format = format.replace('%link', entry.link);
 			format = format.replace('%title', entry.title);
-			format = format.replace('%date', dateFormat(config.dateFormat, new Date(entry.publishedDate)));
+			format = format.replace('%date', dateFormat(new Date(entry.publishedDate)));
 			format = format.replace('%blogTitle', entry.blogTitle);
 			format = format.replace('%blogURL', entry.blogURL);
+			format = format.replace('%category', categoryFormat(entry.categories));
 			
 			return format;
 		}
 		
-		function dateFormat(format, date) {
+		function dateFormat(date) {
+			var format = config.dateFormat;
+			
 			format = format.replace('yyyy', date.getFullYear());
 			
 			mm = date.getMonth() + 1;
@@ -66,15 +71,21 @@
 			return format;
 		}
 		
+		function categoryFormat(categories) {
+			return categories.join(config.categorySeparator);
+		}
+		
 		function compare(a, b) {
 			return new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime();
 		}
 		
 		function afterLoad() {
 			if(config.feeds.length == loaded) {
-				$.each(entries.sort(compare), function(i, entry) {
-					target.append('<li>' + feedFormat(config.feedFormat, entry) + '</li>');
-				});
+				entries.sort(compare);
+				var limit = config.countLimit <= entries.length ? config.countLimit : entries.length;
+				for(j = 0; j < limit; j++) {
+					target.append('<li>' + feedFormat(config.feedFormat, entries[j]) + '</li>');
+				}
 			}
 		}
 		
