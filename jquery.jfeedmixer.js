@@ -19,7 +19,9 @@
 				feeds: new Array(),
 				countPerFeed: 5,
 				countLimit: 10,
-				feedFormat: '<a href="%link">%title(%date)【%blogTitle】[%category]</a>',
+				feedFormat: '<li><a href="%link">%title(%date)【%blogTitle】[%category]</a></li>',
+				beforeFeeds: '<ul>',
+				afterFeeds: '</ul>',
 				dateFormat: 'yyyy.mm.dd',
 				categorySeparator: ', '
 			};
@@ -31,6 +33,7 @@
 		var config = {};
 		var entries = [];
 		var loaded = 0;
+		var container = null;
 		
 		function feedFormat(format, entry) {
 			format = format.replace('%link', entry.link);
@@ -84,15 +87,29 @@
 				entries.sort(compare);
 				var limit = config.countLimit <= entries.length ? config.countLimit : entries.length;
 				for(j = 0; j < limit; j++) {
-					target.append('<li>' + feedFormat(config.feedFormat, entries[j]) + '</li>');
+					container.append(feedFormat(config.feedFormat, entries[j]));
 				}
+				container.appendTo(target);
 			}
 		}
 		
 		return this.each(function(){
 			config = $.extend({}, $.jFeedMixer.defaults, options);
-			target.append('<ul></ul>');
-			target = target.children('ul');
+			container = $(config.beforeFeeds + config.afterFeeds);
+			
+//			target.append(config.beforeFeeds + config.$beforeFeeds);
+//			target = target.children('ul');
+			
+			if(config.feedFormat.search(/.jfm.html$/) >= 0) {
+				$.ajax({
+					type: 'GET',
+					url: config.feedFormat,
+					success: function(data) {
+						config.feedFormat = data;
+					}
+				})
+			}
+			
 			$.each(config.feeds, function(i, url) {
 				var gfeed = new google.feeds.Feed(url);
 				gfeed.setNumEntries(config.countPerFeed);
