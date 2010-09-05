@@ -9,7 +9,7 @@
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
  *
- * Version: 0.1.0
+ * Version: 0.2.1
  * Note: Requires jquery 1.4.2 or above
  */
 (function($) { 
@@ -96,9 +96,6 @@
 		return this.each(function(){
 			config = $.extend({}, $.jFeedMixer.defaults, options);
 			container = $(config.beforeFeeds + config.afterFeeds);
-			
-//			target.append(config.beforeFeeds + config.$beforeFeeds);
-//			target = target.children('ul');
 			
 			if(config.feedFormat.search(/.jfm.html$/) >= 0) {
 				$.ajax({
