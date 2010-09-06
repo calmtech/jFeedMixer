@@ -9,7 +9,7 @@
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
  *
- * Version: 0.2.1
+ * Version: 0.2.0
  * Note: Requires jquery 1.4.2 or above
  */
 (function($) { 
