@@ -136,6 +136,11 @@
 								}
 								entry.blogTitle = feed.title;
 								entry.blogURL = feed.link;
+								if(feed.image) {
+									entry.imgSrc = feed.image.url;
+									entry.imgTitle = feed.image.title;
+									entry.imgLink = feed.image.link;
+								}
 								entries.push(entry);
 							});
 						}
@@ -143,6 +148,11 @@
 							var entry = feed.item;
 							entry.blogTitle = feed.item.title;
 							entry.blogURL = feed.item.link;
+							if(feed.image) {
+								entry.imgSrc = feed.image.url;
+								entry.imgTitle = feed.image.title;
+								entry.imgLink = feed.image.link;
+							}
 							entries.push(entry);
 						}
 						loaded++;
