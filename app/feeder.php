@@ -14,16 +14,5 @@ $data = str_replace('content:encoded', 'content', $data);
 $data = str_replace('dc:creator', 'author', $data);
 $feed = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
 $feed = json_decode(json_encode($feed));
-if(is_array($feed->channel->item)) {
-  foreach($feed->channel->item as $i => $item)
-  {
-    $feed->channel->item[$i]->description = strip_tags($item->description);
-    $feed->channel->item[$i]->content = strip_tags($item->content);
-  }
-}
-else {
-  $feed->channel->item->description = strip_tags($feed->channel->item->description);
-  $feed->channel->item->content = strip_tags($feed->channel->item->content);
-}
 echo json_encode($feed);
 ?>

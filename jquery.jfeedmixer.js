@@ -39,13 +39,15 @@
 		var container = null;
 
 		function feedFormat(format, entry) {
-			format = format.replace('%link', entry.link);
-			format = format.replace('%title', entry.title.substr(0, config.titleLength));
-			format = format.replace('%content', entry.content.substr(0, config.contentLength));
-			format = format.replace('%date', dateFormat(new Date(entry.pubDate)));
-			format = format.replace('%blogTitle', entry.blogTitle);
-			format = format.replace('%blogURL', entry.blogURL);
-			format = format.replace('%category', categoryFormat(entry.category));
+			format = format.replace(/%link/g, entry.link);
+			format = format.replace(/%title/g, entry.title.substr(0, config.titleLength));
+			format = format.replace(/%content/g, entry.description.substr(0, config.contentLength));
+			format = format.replace(/%date/g, dateFormat(new Date(entry.pubDate)));
+			format = format.replace(/%blogTitle/g, entry.blogTitle);
+			format = format.replace(/%blogURL/g, entry.blogURL);
+			format = format.replace(/%category/g, categoryFormat(entry.category));
+			format = format.replace(/%imgSrc/g, entry.imgSrc);
+			format = format.replace(/%imgTitle/g, entry.imgTitle);
 
 			return format;
 		}
@@ -102,10 +104,22 @@
 			entries.sort(compare);
 			var limit = config.countLimit <= entries.length ? config.countLimit : entries.length;
 			for(var j = 0; j < limit; j++) {
-				console.log(j);
 				container.append(feedFormat(config.feedFormat, entries[j]));
 			}
 			container.appendTo(target);
+		}
+
+		function convertToEntry(entry, feed) {
+			entry.blogTitle = feed.title;
+			entry.blogURL = feed.link;
+			var img = $(entry.description).find('img')
+			if(img.length > 0) {
+				entry.imgSrc = img.attr('src');
+				entry.imgTitle = img.attr('title');
+			}
+			entry.description = $('<div>').html(entry.description).text().replace(/[\[\]\…\-+\*\/\s]/g, '');
+
+			return entry;
 		}
 
 		return this.each(function(){
@@ -134,26 +148,11 @@
 								if(i >= config.countPerFeed) {
 									return;
 								}
-								entry.blogTitle = feed.title;
-								entry.blogURL = feed.link;
-								if(feed.image) {
-									entry.imgSrc = feed.image.url;
-									entry.imgTitle = feed.image.title;
-									entry.imgLink = feed.image.link;
-								}
-								entries.push(entry);
+								entries.push(convertToEntry(entry, feed));
 							});
 						}
 						else {
-							var entry = feed.item;
-							entry.blogTitle = feed.item.title;
-							entry.blogURL = feed.item.link;
-							if(feed.image) {
-								entry.imgSrc = feed.image.url;
-								entry.imgTitle = feed.image.title;
-								entry.imgLink = feed.image.link;
-							}
-							entries.push(entry);
+							entries.push(convertToEntry(feed.item, feed));
 						}
 						loaded++;
 						if(config.feeds.length == loaded) {
