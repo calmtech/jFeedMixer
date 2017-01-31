@@ -112,12 +112,12 @@
 		function convertToEntry(entry, feed) {
 			entry.blogTitle = feed.title;
 			entry.blogURL = feed.link;
-			var img = $(entry.description).find('img')
+			var img = $($('div').html(entry.content)).find('img').first()
 			if(img.length > 0) {
 				entry.imgSrc = img.attr('src');
 				entry.imgTitle = img.attr('title');
 			}
-			entry.description = $('<div>').html(entry.description).text().replace(/[\[\]\…\-+\*\/\s]/g, '');
+			entry.description = $('<div>').html(entry.description).text();
 
 			return entry;
 		}
@@ -140,11 +140,20 @@
 				$.ajax({
 					type: 'GET',
 					dataType: 'json',
-					url: config.pathToFeeder + '/feeder.php?url=' + url,
+					url: config.pathToFeeder + '/feeder.php?url=' + encodeURIComponent(url),
 					success: function(json) {
+
 						var feed = json.channel;
 						if(Array.isArray(feed.item)) {
 							$.each(feed.item, function(i, entry) {
+								if(i >= config.countPerFeed) {
+									return;
+								}
+								entries.push(convertToEntry(entry, feed));
+							});
+						}
+						else if(Array.isArray(json.item)) {
+							$.each(json.item, function(i, entry) {
 								if(i >= config.countPerFeed) {
 									return;
 								}

@@ -17,9 +17,15 @@
 					'http://www.dining-tsubaki.jp/news/feed',
 					'http://www.saitohome.co.jp/wp/works/feed',
 					'http://www.saitohome.co.jp/wp/feed'
+					'http://blog.connacht.jp/?mode=rss',
+					'http://shop.connacht.jp/?mode=rss'
 				],
 				countPerFeed: 5, // 1サイトあたりの記事取得件数
 				countLimit: 20, // 全体での記事表示件数
+				beforeFeeds: '<ul class="feed">',
+				afterFeeds: '</ul>',
+				nocache: false,
+				pathToFeeder: '/app',
 				feedFormat: 'feed.jfm.html',
 				dateFormat: 'yyyy-mm-dd',
 				categorySeparator: ' | ',

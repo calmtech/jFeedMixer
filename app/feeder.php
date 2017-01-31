@@ -9,9 +9,10 @@
 
 date_default_timezone_set('Asia/Tokyo');
 $url = $_GET['url'];
-$data = file_get_contents($url);
+$data = file_get_contents(rawurldecode($url));
 $data = str_replace('content:encoded', 'content', $data);
 $data = str_replace('dc:creator', 'author', $data);
+$data = str_replace('dc:date', 'pubDate', $data);
 $feed = simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOCDATA);
 $feed = json_decode(json_encode($feed));
 echo json_encode($feed);
