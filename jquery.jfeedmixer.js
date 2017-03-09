@@ -112,7 +112,7 @@
 		function convertToEntry(entry, feed) {
 			entry.blogTitle = feed.title;
 			entry.blogURL = feed.link;
-			var img = $($('div').html(entry.content)).find('img').first()
+			var img = $($('<div>').html(entry.content)).find('img').first()
 			if(img.length > 0) {
 				entry.imgSrc = img.attr('src');
 				entry.imgTitle = img.attr('title');
