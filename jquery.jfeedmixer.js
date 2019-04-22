@@ -42,7 +42,12 @@
 			format = format.replace(/%link/g, entry.link);
 			format = format.replace(/%title/g, entry.title.substr(0, config.titleLength));
 			format = format.replace(/%content/g, entry.description.substr(0, config.contentLength));
-			format = format.replace(/%date/g, dateFormat(new Date(entry.pubDate)));
+			if(Array.isArray(entry.pubDate)) {
+				format = format.replace(/%date/g, dateFormat(new Date(entry.pubDate[0])));
+			}
+			else {
+				format = format.replace(/%date/g, dateFormat(new Date(entry.pubDate)));
+			}
 			format = format.replace(/%blogTitle/g, entry.blogTitle);
 			format = format.replace(/%blogURL/g, entry.blogURL);
 			format = format.replace(/%category/g, categoryFormat(entry.category));
