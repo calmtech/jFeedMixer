@@ -1,6 +1,6 @@
 /**
  * jFeexMixer - jQuery plugin to embed the multifeed in your website via Google Feed API.
- * @requires jQuery v1.4.2 or above
+ * @requires jQuery v1.x and v1.4 above
  *
  * http://www.calmtech.net/jfeedmixer
  *
@@ -9,7 +9,7 @@
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
  *
- * Version: 0.2.1
+ * Version: 1.1
  */
 (function($) {
 	$.extend({
@@ -23,7 +23,10 @@
 				afterFeeds: '</ul>',
 				dateFormat: 'yyyy.mm.dd',
 				categorySeparator: ', ',
-				nocache: false
+				nocache: false,
+				pathToFeeder: '/app',
+				titleLength: 20,
+				contentLength: 80
 			};
 		}
 	});
@@ -36,12 +39,20 @@
 		var container = null;
 
 		function feedFormat(format, entry) {
-			format = format.replace('%link', entry.link);
-			format = format.replace('%title', entry.title);
-			format = format.replace('%date', dateFormat(new Date(entry.publishedDate)));
-			format = format.replace('%blogTitle', entry.blogTitle);
-			format = format.replace('%blogURL', entry.blogURL);
-			format = format.replace('%category', categoryFormat(entry.categories));
+			format = format.replace(/%link/g, entry.link);
+			format = format.replace(/%title/g, entry.title.substr(0, config.titleLength));
+			format = format.replace(/%content/g, entry.description.substr(0, config.contentLength));
+			if(Array.isArray(entry.pubDate)) {
+				format = format.replace(/%date/g, dateFormat(new Date(entry.pubDate[0])));
+			}
+			else {
+				format = format.replace(/%date/g, dateFormat(new Date(entry.pubDate)));
+			}
+			format = format.replace(/%blogTitle/g, entry.blogTitle);
+			format = format.replace(/%blogURL/g, entry.blogURL);
+			format = format.replace(/%category/g, categoryFormat(entry.category));
+			format = format.replace(/%imgSrc/g, entry.imgSrc);
+			format = format.replace(/%imgTitle/g, entry.imgTitle);
 
 			return format;
 		}
@@ -51,23 +62,29 @@
 
 			format = format.replace('yyyy', date.getFullYear());
 
-			mm = date.getMonth() + 1;
+			var mm = date.getMonth() + 1;
 			if(mm < 10) mm = "0" + mm;
 			format = format.replace('mm', mm);
 
-			dd = date.getDate();
+			var n = date.getMonth() + 1;
+			format = format.replace('n', n);
+
+			var dd = date.getDate();
 			if(dd < 10) dd = "0" + dd;
 			format = format.replace('dd', dd);
 
-			H = date.getHours();
+			var j = date.getDate();
+			format = format.replace('j', j);
+
+			var H = date.getHours();
 			if(H < 10) H = "0" + H;
 			format = format.replace('H', H);
 
-			i = date.getMinutes();
+			var i = date.getMinutes();
 			if(i < 10) i = "0" + i;
 			format = format.replace('i', i);
 
-			s = date.getSeconds();
+			var s = date.getSeconds();
 			if(s < 10) s = "0" + s;
 			format = format.replace('s', s);
 
@@ -75,23 +92,39 @@
 		}
 
 		function categoryFormat(categories) {
-			return categories.join(config.categorySeparator);
+			if(Array.isArray(categories)) {
+				return categories.join(config.categorySeparator);
+			}
+			else {
+				return categories;
+			}
 		}
 
 		function compare(a, b) {
-			return new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime();
+			return new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime();
 		}
 
 		function afterLoad() {
-			if(config.feeds.length == loaded) {
-				$(target).empty();
-				entries.sort(compare);
-				var limit = config.countLimit <= entries.length ? config.countLimit : entries.length;
-				for(j = 0; j < limit; j++) {
-					container.append(feedFormat(config.feedFormat, entries[j]));
-				}
-				container.appendTo(target);
+			$(target).empty();
+			entries.sort(compare);
+			var limit = config.countLimit <= entries.length ? config.countLimit : entries.length;
+			for(var j = 0; j < limit; j++) {
+				container.append(feedFormat(config.feedFormat, entries[j]));
 			}
+			container.appendTo(target);
+		}
+
+		function convertToEntry(entry, feed) {
+			entry.blogTitle = feed.title;
+			entry.blogURL = feed.link;
+			var img = $($('<div>').html(entry.content)).find('img').first()
+			if(img.length > 0) {
+				entry.imgSrc = img.attr('src');
+				entry.imgTitle = img.attr('title');
+			}
+			entry.description = $('<div>').html(entry.description).text();
+
+			return entry;
 		}
 
 		return this.each(function(){
@@ -109,21 +142,36 @@
 			}
 
 			$.each(config.feeds, function(i, url) {
-				if(config.nocache) {
-					url += '?' + (new Date()).getTime();
-				}
-				var gfeed = new google.feeds.Feed(url);
-				gfeed.setNumEntries(config.countPerFeed);
-				gfeed.load(function(result) {
-					if(!result.error) {
-						var feed = result.feed;
-						$.each(feed.entries, function(i, entry) {
-							entry.blogTitle = feed.title;
-							entry.blogURL = feed.link;
-							entries.push(entry);
-						});
+				$.ajax({
+					type: 'GET',
+					dataType: 'json',
+					url: config.pathToFeeder + '/feeder.php?url=' + encodeURIComponent(url),
+					success: function(json) {
+
+						var feed = json.channel;
+						if(Array.isArray(feed.item)) {
+							$.each(feed.item, function(i, entry) {
+								if(i >= config.countPerFeed) {
+									return;
+								}
+								entries.push(convertToEntry(entry, feed));
+							});
+						}
+						else if(Array.isArray(json.item)) {
+							$.each(json.item, function(i, entry) {
+								if(i >= config.countPerFeed) {
+									return;
+								}
+								entries.push(convertToEntry(entry, feed));
+							});
+						}
+						else {
+							entries.push(convertToEntry(feed.item, feed));
+						}
 						loaded++;
-						afterLoad();
+						if(config.feeds.length == loaded) {
+							afterLoad();
+						}
 					}
 				});
 			});
